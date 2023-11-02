@@ -13,6 +13,7 @@ public class NetWorkManagerUI : MonoBehaviour
 {
     const string pattern = @"^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
 
+    [SerializeField] private Transform ball;
 
     [SerializeField] private Button serverButton;
     [SerializeField] private Button hostButton;
@@ -49,5 +50,15 @@ public class NetWorkManagerUI : MonoBehaviour
             }
         });
         
+    }
+
+    private void Update()
+    {
+        if (UnityEngine.Input.GetKeyDown(KeyCode.T))
+        {
+            Transform spawnedBall = Instantiate(ball);
+            spawnedBall.GetComponent<NetworkObject>().Spawn(true);
+        }
+
     }
 }
