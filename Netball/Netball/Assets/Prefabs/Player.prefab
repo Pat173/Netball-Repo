@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 3234285614288328065}
   - component: {fileID: 2081469467833433957}
   - component: {fileID: 3910966725390553868}
-  - component: {fileID: 3726429070740365486}
+  - component: {fileID: 4789148135024691921}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -147,7 +147,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67550b6993f04417ea7ef2fe384a63ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3726429070740365486
+  playerHealth:
+    m_InternalValue: 100
+  playerHasBall: 0
+--- !u!114 &4789148135024691921
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -156,7 +159,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3234285614288328064}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: 1478a51c9a9ecb944b55018245deda23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SyncPositionX: 1
