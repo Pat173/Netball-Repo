@@ -22,7 +22,7 @@ public class PlayerNetwork : NetworkBehaviour
 
         if(Input.GetKey(KeyCode.B)) playerHasBall = true;
 
-
+        if (Input.GetKey(KeyCode.C)) playerHealth.Value -= 5;
 
     }
 }
