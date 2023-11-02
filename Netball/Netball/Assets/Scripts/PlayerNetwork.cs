@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 
 public class PlayerNetwork : NetworkBehaviour
@@ -9,8 +10,11 @@ public class PlayerNetwork : NetworkBehaviour
 
     public NetworkVariable<bool> playerHasBall = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+
+
     private void Update()
     {
+
         if (!IsOwner) return;
 
         float moveSpeed = 3;
