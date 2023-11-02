@@ -10,7 +10,16 @@ public class PlayerNetwork : NetworkBehaviour
 
     public NetworkVariable<bool> playerHasBall = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+    private Vector2 mousePos;
+    private Camera cam;
+    private Rigidbody2D rb;
+    public GameObject graphics;
 
+    public override void OnNetworkSpawn()
+    {
+        cam = Camera.main;
+        rb = GetComponent<Rigidbody2D>();
+    }
 
     private void Update()
     {
@@ -27,6 +36,12 @@ public class PlayerNetwork : NetworkBehaviour
         if(Input.GetKey(KeyCode.B)) playerHasBall.Value = true;
 
         if (Input.GetKey(KeyCode.C)) playerHealth.Value -= 5;
+
+        mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 lookDir = mousePos - rb.position;
+        float angle = Mathf.Atan2(lookDir.y,lookDir.x)* Mathf.Rad2Deg -90f;
+        graphics.transform.rotation = Quaternion.Euler(0,0,angle);
+
 
     }
 }
