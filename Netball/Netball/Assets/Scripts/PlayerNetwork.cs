@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class PlayerNetwork : NetworkBehaviour
 {
-    public NetworkVariable<float> playerHealth = new NetworkVariable<float>(100);
+    public NetworkVariable<float> playerHealth = new NetworkVariable<float>(100, NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Owner);
 
-    public NetworkVariable<bool> playerHasBall = new NetworkVariable<bool>(false);
+    public NetworkVariable<bool> playerHasBall = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     private void Update()
     {
