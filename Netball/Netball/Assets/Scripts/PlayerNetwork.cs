@@ -5,7 +5,10 @@ using UnityEngine;
 
 public class PlayerNetwork : NetworkBehaviour
 {
-    
+    public NetworkVariable<float> playerHealth = new NetworkVariable<float>(100);
+
+    public bool playerHasBall = false;
+
     private void Update()
     {
         if (!IsOwner) return;
@@ -16,6 +19,8 @@ public class PlayerNetwork : NetworkBehaviour
         if (Input.GetKey(KeyCode.S)) transform.Translate(Vector3.down * moveSpeed * Time.deltaTime);
         if (Input.GetKey(KeyCode.D)) transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
         if (Input.GetKey(KeyCode.A)) transform.Translate(Vector3.left * moveSpeed * Time.deltaTime);
+
+        if(Input.GetKey(KeyCode.B)) playerHasBall = true;
 
 
 
