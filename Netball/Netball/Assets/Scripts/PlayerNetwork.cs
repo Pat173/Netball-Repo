@@ -7,7 +7,7 @@ public class PlayerNetwork : NetworkBehaviour
 {
     public NetworkVariable<float> playerHealth = new NetworkVariable<float>(100);
 
-    public bool playerHasBall = false;
+    public NetworkVariable<bool> playerHasBall = new NetworkVariable<bool>(false);
 
     private void Update()
     {
@@ -20,7 +20,7 @@ public class PlayerNetwork : NetworkBehaviour
         if (Input.GetKey(KeyCode.D)) transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
         if (Input.GetKey(KeyCode.A)) transform.Translate(Vector3.left * moveSpeed * Time.deltaTime);
 
-        if(Input.GetKey(KeyCode.B)) playerHasBall = true;
+        if(Input.GetKey(KeyCode.B)) playerHasBall.Value = true;
 
         if (Input.GetKey(KeyCode.C)) playerHealth.Value -= 5;
 
