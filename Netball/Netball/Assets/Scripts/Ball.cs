@@ -36,7 +36,10 @@ public class Ball : NetworkBehaviour
         attachedToPlayer = true;
         transform.parent = collision.transform;
         transform.localPosition = Vector2.zero;
-       
+
+
+        collision.GetComponent<PlayerNetwork>().playerHasBall.Value = true; 
+        
         Debug.Log(collision.GetComponent<NetworkObject>().OwnerClientId);
     }
 }

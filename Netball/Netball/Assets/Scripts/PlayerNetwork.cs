@@ -8,7 +8,7 @@ public class PlayerNetwork : NetworkBehaviour
 {
     public NetworkVariable<float> playerHealth = new NetworkVariable<float>(100, NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Owner);
 
-    public NetworkVariable<bool> playerHasBall = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<bool> playerHasBall = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     private Vector2 mousePos;
     private Camera cam;
