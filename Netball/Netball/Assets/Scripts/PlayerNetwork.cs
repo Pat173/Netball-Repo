@@ -14,6 +14,8 @@ public class PlayerNetwork : NetworkBehaviour
     private Camera cam;
     private Rigidbody2D rb;
     public GameObject graphics;
+    public GameObject ballIndicator;
+    public Transform shootPos;
 
     public override void OnNetworkSpawn()
     {
@@ -33,8 +35,6 @@ public class PlayerNetwork : NetworkBehaviour
         if (Input.GetKey(KeyCode.D)) transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
         if (Input.GetKey(KeyCode.A)) transform.Translate(Vector3.left * moveSpeed * Time.deltaTime);
 
-        if(Input.GetKey(KeyCode.B)) playerHasBall.Value = true;
-
         if (Input.GetKey(KeyCode.C)) playerHealth.Value -= 5;
 
         mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
@@ -42,6 +42,37 @@ public class PlayerNetwork : NetworkBehaviour
         float angle = Mathf.Atan2(lookDir.y,lookDir.x)* Mathf.Rad2Deg -90f;
         graphics.transform.rotation = Quaternion.Euler(0,0,angle);
 
+        if (playerHasBall.Value == true)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                OnBallDropServerRPC();
+                Ball.instance.ShootBallServerRPC(shootPos.position, lookDir);
+            }
+        }
 
+
+    }
+
+    [ClientRpc]
+    public void OnBallPickUpClientRPC()
+    {
+        ballIndicator.SetActive(true);
+        playerHasBall.Value = true;
+    }
+    
+    [ServerRpc]
+    public void OnBallDropServerRPC()
+    {
+        OnBallDropClientRPC();
+        ballIndicator.SetActive(false);
+        playerHasBall.Value = false;
+    }
+    
+    [ClientRpc]
+    public void OnBallDropClientRPC()
+    {
+        ballIndicator.SetActive(false);
+        playerHasBall.Value = false;
     }
 }
