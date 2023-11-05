@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 8126233228704829692}
   - component: {fileID: 8138474910229327637}
   - component: {fileID: 7428323787993551722}
-  - component: {fileID: 8402805090139362584}
-  - component: {fileID: 2117751838578821588}
+  - component: {fileID: 5317446063333568396}
+  - component: {fileID: 7032437234338232749}
   m_Layer: 0
   m_Name: Ball
   m_TagString: Untagged
@@ -103,7 +103,7 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &8402805090139362584
+--- !u!114 &5317446063333568396
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -112,7 +112,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8126233228704829682}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: 1478a51c9a9ecb944b55018245deda23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SyncPositionX: 1
@@ -129,7 +129,7 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
---- !u!114 &2117751838578821588
+--- !u!114 &7032437234338232749
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

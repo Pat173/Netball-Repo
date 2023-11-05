@@ -16,10 +16,10 @@ public class Ball : NetworkBehaviour
         ballRb = GetComponent<Rigidbody2D>();
         ballCollider = GetComponent<CircleCollider2D>();
 
-        InitialBallMovement(new Vector2(-5,0),new Vector2(5,1));
+        
     }
     
-    private void InitialBallMovement(Vector2 startPos, Vector2 dir)
+    public void InitialBallMovement(Vector2 startPos, Vector2 dir)
     {
         transform.position = new Vector3(startPos.x, startPos.y, 0);
         ballRb.AddForce(dir.normalized *5, ForceMode2D.Impulse);

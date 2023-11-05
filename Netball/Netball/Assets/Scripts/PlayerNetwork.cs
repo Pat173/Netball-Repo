@@ -49,6 +49,11 @@ public class PlayerNetwork : NetworkBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 OnBallShootServerRPC(lookDir);
+                
+                ballIndicator.SetActive(false);
+                playerHasBall.Value = false;
+        
+                Shoot(lookDir);
             }
         }
 
@@ -60,36 +65,36 @@ public class PlayerNetwork : NetworkBehaviour
         {
             OnBallPickUpServerRPC();
             
-            ballIndicator.SetActive(true);
-            playerHasBall.Value = true;
+            PickUpBall();
             
-            
+            col.gameObject.GetComponent<NetworkObject>().Despawn(true);
             Destroy(col.gameObject);
+            
         }
     }
     
-    [ServerRpc]
-    public void OnBallPickUpServerRPC()
+    [ServerRpc (RequireOwnership = false)]
+    private void OnBallPickUpServerRPC()
     {
+        Debug.Log("pickUpServercall");
         OnBallPickUpClientRPC();
     }
 
     [ClientRpc]
-    public void OnBallPickUpClientRPC()
+    private void OnBallPickUpClientRPC()
     {
-        if (!IsOwner)
-        {
-            ballIndicator.SetActive(true);
-            playerHasBall.Value = true;
-        }
+        if (!IsOwner) PickUpBall();
+    }
+
+    private void PickUpBall()
+    {
+        ballIndicator.SetActive(true);
+        playerHasBall.Value = true;
     }
     
-    [ServerRpc]
+    [ServerRpc (RequireOwnership = false)]
     public void OnBallShootServerRPC(Vector2 dir)
     {
-        
-        ballIndicator.SetActive(false);
-        playerHasBall.Value = false;
         
         OnBallShootClientRPC(dir);
     }
@@ -107,8 +112,10 @@ public class PlayerNetwork : NetworkBehaviour
 
     void Shoot(Vector2 dir)
     {
-        GameObject spawnedBall = Instantiate(ballPrefab);
-        spawnedBall.GetComponent<NetworkObject>().IsSpawned = true;
+        Debug.Log("Shoot");
+        GameObject spawnedBall = Instantiate(ballPrefab,shootPos.position,shootPos.rotation);
+        
+        spawnedBall.GetComponent<NetworkObject>().Spawn(true);
         spawnedBall.GetComponent<Rigidbody2D>().AddForce(dir*5,ForceMode2D.Impulse);
         
     }
