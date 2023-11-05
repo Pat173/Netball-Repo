@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -13,6 +14,7 @@ public class PlayerNetwork : NetworkBehaviour
     private Vector2 mousePos;
     private Camera cam;
     private Rigidbody2D rb;
+    [SerializeField] private GameObject ballPrefab;
     public GameObject graphics;
     public GameObject ballIndicator;
     public Transform shootPos;
@@ -46,33 +48,68 @@ public class PlayerNetwork : NetworkBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                OnBallDropServerRPC();
-                Ball.instance.ShootBallServerRPC(shootPos.position, lookDir);
+                OnBallShootServerRPC(lookDir);
             }
         }
 
+    }
 
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.GetComponent<Ball>())
+        {
+            OnBallPickUpServerRPC();
+            
+            ballIndicator.SetActive(true);
+            playerHasBall.Value = true;
+            
+            
+            Destroy(col.gameObject);
+        }
+    }
+    
+    [ServerRpc]
+    public void OnBallPickUpServerRPC()
+    {
+        OnBallPickUpClientRPC();
     }
 
     [ClientRpc]
     public void OnBallPickUpClientRPC()
     {
-        ballIndicator.SetActive(true);
-        playerHasBall.Value = true;
+        if (!IsOwner)
+        {
+            ballIndicator.SetActive(true);
+            playerHasBall.Value = true;
+        }
     }
     
     [ServerRpc]
-    public void OnBallDropServerRPC()
+    public void OnBallShootServerRPC(Vector2 dir)
     {
-        OnBallDropClientRPC();
+        
         ballIndicator.SetActive(false);
         playerHasBall.Value = false;
+        
+        OnBallShootClientRPC(dir);
     }
     
     [ClientRpc]
-    public void OnBallDropClientRPC()
+    public void OnBallShootClientRPC(Vector2 dir)
     {
-        ballIndicator.SetActive(false);
-        playerHasBall.Value = false;
+        if (!IsOwner)
+        {
+            Shoot(dir);
+            ballIndicator.SetActive(false);
+            playerHasBall.Value = false;
+        }
+    }
+
+    void Shoot(Vector2 dir)
+    {
+        GameObject spawnedBall = Instantiate(ballPrefab);
+        spawnedBall.GetComponent<NetworkObject>().IsSpawned = true;
+        spawnedBall.GetComponent<Rigidbody2D>().AddForce(dir*5,ForceMode2D.Impulse);
+        
     }
 }

@@ -56,8 +56,7 @@ public class NetWorkManagerUI : MonoBehaviour
     {
         if (UnityEngine.Input.GetKeyDown(KeyCode.T))
         {
-            Transform spawnedBall = Instantiate(ball);
-            spawnedBall.GetComponent<NetworkObject>().Spawn(true);
+            Instantiate(ball);
         }
 
     }
