@@ -53,7 +53,7 @@ public class PlayerNetwork : NetworkBehaviour
                 ballIndicator.SetActive(false);
                 playerHasBall.Value = false;
         
-                Shoot(lookDir);
+                //Shoot(lookDir);
             }
         }
 
@@ -116,7 +116,7 @@ public class PlayerNetwork : NetworkBehaviour
         GameObject spawnedBall = Instantiate(ballPrefab,shootPos.position,shootPos.rotation);
         
         spawnedBall.GetComponent<NetworkObject>().Spawn(true);
-        spawnedBall.GetComponent<Rigidbody2D>().AddForce(dir*5,ForceMode2D.Impulse);
+        //spawnedBall.GetComponent<Rigidbody2D>().AddForce(dir*5,ForceMode2D.Impulse);
         
     }
 }
