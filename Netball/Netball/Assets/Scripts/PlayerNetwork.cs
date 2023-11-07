@@ -53,7 +53,7 @@ public class PlayerNetwork : NetworkBehaviour
                 ballIndicator.SetActive(false);
                 playerHasBall.Value = false;
         
-                //Shoot(lookDir);
+                Shoot(lookDir);
             }
         }
 
@@ -104,7 +104,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (!IsOwner)
         {
-            Shoot(dir);
+            //Shoot(dir);
             ballIndicator.SetActive(false);
             playerHasBall.Value = false;
         }
