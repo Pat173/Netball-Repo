@@ -48,12 +48,12 @@ public class PlayerNetwork : NetworkBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                OnBallShootServerRPC(lookDir);
+                OnBallShootServerRpc(lookDir);
                 
                 ballIndicator.SetActive(false);
                 playerHasBall.Value = false;
         
-                Shoot(lookDir);
+                
             }
         }
 
@@ -63,9 +63,10 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (col.GetComponent<Ball>())
         {
-            OnBallPickUpServerRPC();
+            OnBallPickUpServerRpc();
             
-            PickUpBall();
+            ballIndicator.SetActive(true);
+            playerHasBall.Value = true;
             
             col.gameObject.GetComponent<NetworkObject>().Despawn(true);
             Destroy(col.gameObject);
@@ -74,16 +75,17 @@ public class PlayerNetwork : NetworkBehaviour
     }
     
     [ServerRpc (RequireOwnership = false)]
-    private void OnBallPickUpServerRPC()
+    private void OnBallPickUpServerRpc()
     {
         Debug.Log("pickUpServercall");
-        OnBallPickUpClientRPC();
+        PickUpBall();
+        OnBallPickUpClientRpc();
     }
 
     [ClientRpc]
-    private void OnBallPickUpClientRPC()
+    private void OnBallPickUpClientRpc()
     {
-        if (!IsOwner) PickUpBall();
+        PickUpBall();
     }
 
     private void PickUpBall()
@@ -93,21 +95,19 @@ public class PlayerNetwork : NetworkBehaviour
     }
     
     [ServerRpc (RequireOwnership = false)]
-    public void OnBallShootServerRPC(Vector2 dir)
+    public void OnBallShootServerRpc(Vector2 dir)
     {
-        
-        OnBallShootClientRPC(dir);
+        Shoot(dir);
+        ballIndicator.SetActive(false);
+        playerHasBall.Value = false;
+        OnBallShootClientRpc(dir);
     }
     
     [ClientRpc]
-    public void OnBallShootClientRPC(Vector2 dir)
+    public void OnBallShootClientRpc(Vector2 dir)
     {
-        if (!IsOwner)
-        {
-            //Shoot(dir);
-            ballIndicator.SetActive(false);
-            playerHasBall.Value = false;
-        }
+        ballIndicator.SetActive(false);
+        playerHasBall.Value = false;
     }
 
     void Shoot(Vector2 dir)
