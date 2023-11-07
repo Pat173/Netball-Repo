@@ -18,7 +18,12 @@ public class Ball : NetworkBehaviour
 
         
     }
-    
+
+    private void Update()
+    {
+        transform.Translate(Vector3.up * Time.deltaTime* 2);
+    }
+
     public void InitialBallMovement(Vector2 startPos, Vector2 dir)
     {
         transform.position = new Vector3(startPos.x, startPos.y, 0);
