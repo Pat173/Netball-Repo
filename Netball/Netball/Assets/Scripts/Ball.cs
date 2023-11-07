@@ -11,6 +11,8 @@ public class Ball : NetworkBehaviour
     
     private CircleCollider2D ballCollider;
 
+    public float bulletSpeed = 10;
+
     public override void OnNetworkSpawn()
     {
         
@@ -21,7 +23,7 @@ public class Ball : NetworkBehaviour
 
     private void Update()
     {
-        transform.Translate(Vector3.up * Time.deltaTime* 2);
+        transform.Translate(Vector3.up * Time.deltaTime * bulletSpeed);
     }
 
     

@@ -77,7 +77,6 @@ public class PlayerNetwork : NetworkBehaviour
     [ServerRpc (RequireOwnership = false)]
     private void OnBallPickUpServerRpc()
     {
-        Debug.Log("pickUpServercall");
         PickUpBall();
         OnBallPickUpClientRpc();
     }
@@ -98,8 +97,8 @@ public class PlayerNetwork : NetworkBehaviour
     public void OnBallShootServerRpc(Vector2 dir)
     {
         Shoot(dir);
-        ballIndicator.SetActive(false);
-        playerHasBall.Value = false;
+        // ballIndicator.SetActive(false);
+        // playerHasBall.Value = false;
         OnBallShootClientRpc(dir);
     }
     
