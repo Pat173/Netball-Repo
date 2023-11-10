@@ -61,6 +61,8 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void OnTriggerEnter2D(Collider2D col)
     {
+        if (!IsOwner) return;
+
         if (col.GetComponent<Ball>())
         {
             OnBallPickUpServerRpc();
