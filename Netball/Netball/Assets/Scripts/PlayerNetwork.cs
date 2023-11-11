@@ -63,7 +63,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        if (col.GetComponent<Ball>())
+        if (col.GetComponent<Ball>() != null)
         {
             OnBallPickUpServerRpc();
             
