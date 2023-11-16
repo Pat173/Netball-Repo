@@ -69,20 +69,19 @@ public class PlayerNetwork : NetworkBehaviour
             
             ballIndicator.SetActive(true);
 
-            /*var ballNetworkObject = col.gameObject.GetComponent<NetworkObject>();
-            ballNetworkObject.Despawn(true);
-            Destroy(ballNetworkObject.gameObject);
-            */
-
-            OnDestroyBallServerRpc(col.gameObject.GetComponent<NetworkObject>());
+            var ballNetworkObject = col.gameObject.GetComponent<NetworkObject>();
+            OnDestroyBallServerRpc(new NetworkObjectReference(ballNetworkObject));
         }
     }
 
     [ServerRpc (RequireOwnership =false)]
-    private void OnDestroyBallServerRpc(NetworkObject ball)
+    private void OnDestroyBallServerRpc(NetworkObjectReference ball)
     {
-        ball.Despawn(true);
-        Destroy(ball.gameObject);
+        if (ball.TryGet(out NetworkObject ballObject))
+        {
+            ballObject.Despawn(true);
+            Destroy(ballObject.gameObject);
+        }
     }
 
     [ServerRpc (RequireOwnership = false)]
