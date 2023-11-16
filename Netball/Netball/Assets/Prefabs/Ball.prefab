@@ -196,7 +196,7 @@ MonoBehaviour:
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   InLocalSpace: 0
-  Interpolate: 1
+  Interpolate: 0
 --- !u!50 &6893737826605164000
 Rigidbody2D:
   serializedVersion: 4
@@ -210,7 +210,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
+  m_LinearDrag: 0.19
   m_AngularDrag: 0
   m_GravityScale: 0
   m_Material: {fileID: 0}

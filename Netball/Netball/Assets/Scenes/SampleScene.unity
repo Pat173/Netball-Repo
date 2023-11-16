@@ -161,9 +161,9 @@ MonoBehaviour:
   m_MaxConnectAttempts: 60
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
-    Address: 192.168.1.16
-    Port: 7777
-    ServerListenAddress: 
+    Address: 93.131.72.50
+    Port: 25173
+    ServerListenAddress: 0.0.0.0
   DebugSimulator:
     PacketDelayMS: 0
     PacketJitterMS: 0
