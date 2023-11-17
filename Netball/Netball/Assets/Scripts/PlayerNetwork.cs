@@ -8,14 +8,27 @@ using UnityEngine;
 
 public class PlayerNetwork : NetworkBehaviour
 {
+    public enum PLAYER_STATE
+    {
+        InGame,
+        LoosingHealth,
+        OutOfGame
+    }
+
+
+    public NetworkVariable<PLAYER_STATE> playerState = new NetworkVariable<PLAYER_STATE>(PLAYER_STATE.InGame);
+    
     public NetworkVariable<float> playerHealth = new NetworkVariable<float>(100, NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Owner);
-
-    public NetworkVariable<bool> playerHasBall = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-
+    
+    public NetworkVariable<bool> playerCanRecall = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    
     private Vector2 mousePos;
     private Camera cam;
     private Rigidbody2D rb;
     [SerializeField] private GameObject ballPrefab;
+
+    private GameObject spawnedBall;
+    
     public GameObject graphics;
     public GameObject ballIndicator;
     public Transform shootPos;
@@ -28,7 +41,6 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void Update()
     {
-
         if (!IsOwner) return;
 
         float moveSpeed = 3;
@@ -45,19 +57,26 @@ public class PlayerNetwork : NetworkBehaviour
         float angle = Mathf.Atan2(lookDir.y,lookDir.x)* Mathf.Rad2Deg -90f;
         graphics.transform.rotation = Quaternion.Euler(0,0,angle);
 
-        if (playerHasBall.Value == true)
+        if (playerState.Value == PLAYER_STATE.LoosingHealth)
         {
+            // UPDATE HEALTH
+            
+            
+            
             if (Input.GetMouseButtonDown(0))
             {
                 OnBallShootServerRpc(lookDir);
                 
                 ballIndicator.SetActive(false);
+            }
+
+            if (Input.GetMouseButtonDown(1) && playerCanRecall.Value)
+            {
+                OnBallRecallServerRpc();
                 
-        
-                
+                ballIndicator.SetActive(true);
             }
         }
-
     }
 
     private void OnTriggerEnter2D(Collider2D col)
@@ -74,6 +93,10 @@ public class PlayerNetwork : NetworkBehaviour
             OnDestroyBallServerRpc(new NetworkObjectReference(ballNetworkObject));
         }
     }
+    
+    //*************
+    //PICKUP BALL
+    //*************
 
     [ServerRpc (RequireOwnership =false)]
     private void OnDestroyBallServerRpc(NetworkObjectReference ball)
@@ -88,7 +111,8 @@ public class PlayerNetwork : NetworkBehaviour
     [ServerRpc (RequireOwnership = false)]
     private void OnBallPickUpServerRpc()
     {
-        playerHasBall.Value = true;
+        playerState.Value = PLAYER_STATE.LoosingHealth;
+        
         PickUpBall();
         OnBallPickUpClientRpc();
     }
@@ -102,16 +126,26 @@ public class PlayerNetwork : NetworkBehaviour
     private void PickUpBall()
     {
         ballIndicator.SetActive(true);
-        // playerHasBall.Value = true;
+        
+        foreach (var client in NetworkManager.ConnectedClients)
+        {
+            client.Value.PlayerObject.GetComponent<PlayerNetwork>().playerState.Value = PLAYER_STATE.InGame;
+        }
+        
+        playerState.Value = PLAYER_STATE.LoosingHealth;
     }
+    
+    //*************
+    //SHOOTING BALL
+    //*************
     
     [ServerRpc (RequireOwnership = false)]
     public void OnBallShootServerRpc(Vector2 dir)
     {
-        playerHasBall.Value = false;
-        Shoot(dir);
-        // ballIndicator.SetActive(false);
-        // playerHasBall.Value = false;
+        if (playerCanRecall.Value == false)
+        {
+            Shoot(dir);
+        }
         OnBallShootClientRpc(dir);
     }
     
@@ -119,18 +153,44 @@ public class PlayerNetwork : NetworkBehaviour
     public void OnBallShootClientRpc(Vector2 dir)
     {
         ballIndicator.SetActive(false);
-        // playerHasBall.Value = false;
+
+        
     }
 
     void Shoot(Vector2 dir)
     {
+        playerCanRecall.Value = true;
         Debug.Log("Shoot");
-        GameObject spawnedBall = Instantiate(ballPrefab,shootPos.position,shootPos.rotation);
+        spawnedBall = Instantiate(ballPrefab,shootPos.position,shootPos.rotation);
 
         NetworkObject networkObject = spawnedBall.GetComponent<NetworkObject>();
         networkObject.Spawn(true);
+    }
+    
+    //*************
+    //RECALL BALL
+    //*************
 
-        //spawnedBall.GetComponent<Rigidbody2D>().AddForce(dir*5,ForceMode2D.Impulse);
-
+    [ServerRpc (RequireOwnership = false)]
+    public void OnBallRecallServerRpc()
+    {
+        playerCanRecall.Value = false;
+        RecallBall();
+        OnBallRecallClientRpc();
+    }
+    
+    [ClientRpc]
+    public void OnBallRecallClientRpc()
+    {
+        ballIndicator.SetActive(true);
+    }
+    
+    void RecallBall()
+    {
+        if (spawnedBall == null) return;
+        
+        NetworkObject networkObject = spawnedBall.GetComponent<NetworkObject>();
+        networkObject.Despawn(true);
+        Destroy(spawnedBall);
     }
 }
