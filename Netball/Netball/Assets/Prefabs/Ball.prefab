@@ -66,9 +66,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8694c65ed7a10f94a91560273f8f091d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  obstacle:
-    serializedVersion: 2
-    m_Bits: 64
   bulletSpeed: 20
 --- !u!114 &7428323787993551722
 MonoBehaviour:
@@ -125,7 +122,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0.19
+  m_LinearDrag: 0.89
   m_AngularDrag: 0
   m_GravityScale: 0
   m_Material: {fileID: 0}
