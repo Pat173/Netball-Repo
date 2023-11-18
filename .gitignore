@@ -71,7 +71,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-NetBall/UserSettings/
-NetBall/Workflow/
-NetBall/.vsconfig
-NetBall/.idea/
+UserSettings/
+Workflow/
+.vsconfig
+.idea/
