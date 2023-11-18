@@ -26,6 +26,7 @@ public class PlayerNetwork : NetworkBehaviour
     private Camera cam;
     private Rigidbody2D rb;
     [SerializeField] private GameObject ballPrefab;
+    [SerializeField] private float damageRate;
 
     private GameObject spawnedBall;
     
@@ -50,7 +51,7 @@ public class PlayerNetwork : NetworkBehaviour
         if (Input.GetKey(KeyCode.D)) transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
         if (Input.GetKey(KeyCode.A)) transform.Translate(Vector3.left * moveSpeed * Time.deltaTime);
 
-        if (Input.GetKey(KeyCode.C)) playerHealth.Value -= 5;
+        if (Input.GetKeyDown(KeyCode.C)) playerHealth.Value -= 5;
 
         mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
         Vector2 lookDir = mousePos - rb.position;
@@ -59,9 +60,14 @@ public class PlayerNetwork : NetworkBehaviour
 
         if (playerState.Value == PLAYER_STATE.LoosingHealth)
         {
-            // UPDATE HEALTH
+            playerHealth.Value -= damageRate * Time.deltaTime;
             
-            
+            if (playerHealth.Value <= 0)
+            {
+                OnLostGameServerRpc();
+                OnLostGameClientRpc();
+                this.gameObject.SetActive(false);
+            }
             
             if (Input.GetMouseButtonDown(0))
             {
@@ -192,5 +198,19 @@ public class PlayerNetwork : NetworkBehaviour
         NetworkObject networkObject = spawnedBall.GetComponent<NetworkObject>();
         networkObject.Despawn(true);
         Destroy(spawnedBall);
+    }
+
+    //DESTROY PLAYER
+
+    [ServerRpc (RequireOwnership = true)]
+    public void OnLostGameServerRpc()
+    {
+        this.gameObject.SetActive(false);
+    }
+
+    [ClientRpc]
+    public void OnLostGameClientRpc()
+    {
+        this.gameObject.SetActive(false);
     }
 }
