@@ -69,7 +69,8 @@ public class PlayerNetwork : NetworkBehaviour
             if (playerHealth.Value <= 0)
             {
                 OnLostGameServerRpc();
-                
+                collider.enabled = false;
+                graphics.SetActive(false);
             }
             
             if (Input.GetMouseButtonDown(0))
@@ -208,12 +209,11 @@ public class PlayerNetwork : NetworkBehaviour
     [ServerRpc (RequireOwnership = false)]
     public void OnLostGameServerRpc()
     {
-        OnLostGameClientRpc();
         playerState.Value = PLAYER_STATE.OutOfGame;
         collider.enabled = false;
         graphics.SetActive(false);
+        OnLostGameClientRpc();
        
-        
     }
 
     [ClientRpc]
