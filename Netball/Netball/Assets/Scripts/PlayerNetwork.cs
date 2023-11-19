@@ -210,8 +210,10 @@ public class PlayerNetwork : NetworkBehaviour
     {
         OnLostGameClientRpc();
         playerState.Value = PLAYER_STATE.OutOfGame;
-        ActivateOrDeactivatePlayer(false);
-        ShootBallRandomlyOnPlayerDeath();
+        collider.enabled = false;
+        graphics.SetActive(false);
+       
+        
     }
 
     [ClientRpc]
@@ -219,16 +221,12 @@ public class PlayerNetwork : NetworkBehaviour
     {
         playerState.Value = PLAYER_STATE.OutOfGame;
         //this.gameObject.SetActive(false);
-        ActivateOrDeactivatePlayer(false);
+        collider.enabled = false;
+        graphics.SetActive(false);
         Debug.Log(" Ded");
+        ShootBallRandomlyOnPlayerDeath();
     }
-
-    public void ActivateOrDeactivatePlayer(bool isActive)
-    {
-        collider.enabled = isActive;
-        graphics.SetActive(isActive);
-    }
-
+    
     public void ShootBallRandomlyOnPlayerDeath()
     {
         GameObject randomSpawnedBallInstance = Instantiate(ballPrefab,shootPos.position,shootPos.rotation);
