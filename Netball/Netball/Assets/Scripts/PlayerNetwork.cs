@@ -5,6 +5,7 @@ using Unity.Multiplayer.Netball.ClientAuthority;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class PlayerNetwork : NetworkBehaviour
 {
@@ -25,6 +26,7 @@ public class PlayerNetwork : NetworkBehaviour
     private Vector2 mousePos;
     private Camera cam;
     private Rigidbody2D rb;
+    private BoxCollider2D collider;
     [SerializeField] private GameObject ballPrefab;
     [SerializeField] private float damageRate;
 
@@ -38,10 +40,12 @@ public class PlayerNetwork : NetworkBehaviour
     {
         cam = Camera.main;
         rb = GetComponent<Rigidbody2D>();
+        collider = GetComponent<BoxCollider2D>();
     }
 
     private void Update()
     {
+        if (playerState.Value == PLAYER_STATE.OutOfGame) return;
         if (!IsOwner) return;
 
         float moveSpeed = 3;
@@ -65,8 +69,7 @@ public class PlayerNetwork : NetworkBehaviour
             if (playerHealth.Value <= 0)
             {
                 OnLostGameServerRpc();
-                OnLostGameClientRpc();
-                this.gameObject.SetActive(false);
+                
             }
             
             if (Input.GetMouseButtonDown(0))
@@ -139,6 +142,7 @@ public class PlayerNetwork : NetworkBehaviour
         }
         
         playerState.Value = PLAYER_STATE.LoosingHealth;
+        playerCanRecall.Value = false;
     }
     
     //*************
@@ -159,8 +163,6 @@ public class PlayerNetwork : NetworkBehaviour
     public void OnBallShootClientRpc(Vector2 dir)
     {
         ballIndicator.SetActive(false);
-
-        
     }
 
     void Shoot(Vector2 dir)
@@ -199,18 +201,41 @@ public class PlayerNetwork : NetworkBehaviour
         networkObject.Despawn(true);
         Destroy(spawnedBall);
     }
-
+    
+    //*************
     //DESTROY PLAYER
-
-    [ServerRpc (RequireOwnership = true)]
+    //*************
+    [ServerRpc (RequireOwnership = false)]
     public void OnLostGameServerRpc()
     {
-        this.gameObject.SetActive(false);
+        OnLostGameClientRpc();
+        playerState.Value = PLAYER_STATE.OutOfGame;
+        ActivateOrDeactivatePlayer(false);
+        ShootBallRandomlyOnPlayerDeath();
     }
 
     [ClientRpc]
     public void OnLostGameClientRpc()
     {
-        this.gameObject.SetActive(false);
+        playerState.Value = PLAYER_STATE.OutOfGame;
+        //this.gameObject.SetActive(false);
+        ActivateOrDeactivatePlayer(false);
+        Debug.Log(" Ded");
+    }
+
+    public void ActivateOrDeactivatePlayer(bool isActive)
+    {
+        collider.enabled = isActive;
+        graphics.SetActive(isActive);
+    }
+
+    public void ShootBallRandomlyOnPlayerDeath()
+    {
+        GameObject randomSpawnedBallInstance = Instantiate(ballPrefab,shootPos.position,shootPos.rotation);
+
+        NetworkObject networkObject = randomSpawnedBallInstance.GetComponent<NetworkObject>();
+        networkObject.Spawn(true);
+        
+        randomSpawnedBallInstance.GetComponent<Rigidbody2D>().AddForce(new Vector2(Random.Range(-1f,1f),Random.Range(-1f,1f)).normalized * 20, ForceMode2D.Impulse);
     }
 }
