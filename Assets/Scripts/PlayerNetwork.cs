@@ -9,24 +9,24 @@ using UnityEngine;
 
 public class PlayerNetwork : NetworkBehaviour
 {
-    public enum PLAYER_STATE
+    public enum EPlayerState
     {
-        InGame,
-        LoosingHealth,
-        OutOfGame
+        Alive,
+        It,
+        Dead
     }
 
-    public NetworkVariable<ulong> playerId = new NetworkVariable<ulong>(1231, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<ulong> playerId = new NetworkVariable<ulong>(0);
     public NetworkVariable<FixedString32Bytes> playerName = new NetworkVariable<FixedString32Bytes>("Test", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    public NetworkVariable<PLAYER_STATE> playerState = new NetworkVariable<PLAYER_STATE>(PLAYER_STATE.InGame);
-    public NetworkVariable<float> playerHealth = new NetworkVariable<float>(100, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    public NetworkVariable<bool> hasBall = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<EPlayerState> playerState = new NetworkVariable<EPlayerState>(EPlayerState.Alive);
+    public NetworkVariable<float> playerHealth = new NetworkVariable<float>(100);
+    public NetworkVariable<bool> hasBall = new NetworkVariable<bool>(false);
 
     private Vector2 mousePos;
     private Camera cam;
     private Rigidbody2D rb;
     [SerializeField] private GameObject ballPrefab;
-    [SerializeField] private float damageRate;
+    [SerializeField] public float damageRate;
 
     private GameObject spawnedBall;
 
@@ -61,29 +61,16 @@ public class PlayerNetwork : NetworkBehaviour
         float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg - 90f;
         graphics.transform.rotation = Quaternion.Euler(0, 0, angle);
 
-        if (playerState.Value == PLAYER_STATE.LoosingHealth)
+        if (playerState.Value == EPlayerState.It)
         {
-            playerHealth.Value -= damageRate * Time.deltaTime;
-
-            if (playerHealth.Value <= 0)
-            {
-                OnLostGameServerRpc();
-                OnLostGameClientRpc();
-                this.gameObject.SetActive(false);
-            }
-
             if (Input.GetMouseButtonDown(0))
             {
                 OnBallShootServerRpc(lookDir);
-
-                ballIndicator.SetActive(false);
             }
 
             if (Input.GetMouseButtonDown(1) && hasBall.Value)
             {
                 OnBallRecallServerRpc();
-
-                ballIndicator.SetActive(true);
             }
         }
     }
@@ -96,10 +83,10 @@ public class PlayerNetwork : NetworkBehaviour
         {
             OnBallPickUpServerRpc();
 
-            ballIndicator.SetActive(true);
-
             var ballNetworkObject = col.gameObject.GetComponent<NetworkObject>();
-            OnDestroyBallServerRpc(new NetworkObjectReference(ballNetworkObject));
+            var pointer = new NetworkObjectReference(ballNetworkObject);
+            OnDestroyBallServerRpc(pointer);
+            OnDestroyBallClientRpc(pointer);
         }
     }
 
@@ -117,31 +104,39 @@ public class PlayerNetwork : NetworkBehaviour
         }
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [ClientRpc]
+    private void OnDestroyBallClientRpc(NetworkObjectReference ball)
+    {
+        if (ball.TryGet(out NetworkObject ballObject))
+        {
+            ballObject.Despawn(true);
+            Destroy(ballObject.gameObject);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = true)]
     private void OnBallPickUpServerRpc()
     {
-        playerState.Value = PLAYER_STATE.LoosingHealth;
+        hasBall.Value = false;
+        playerState.Value = EPlayerState.It;
 
-        PickUpBall();
+        foreach (var player in PlayerList.Instance.Players)
+        {
+            if (player.Value.playerId.Value == playerId.Value) continue;
+
+            player.Value.hasBall.Value = false;
+
+            var health = player.Value.playerHealth.Value;
+            player.Value.playerState.Value = health > 0 ? EPlayerState.Alive : EPlayerState.Dead;
+        }
+
         OnBallPickUpClientRpc();
     }
 
     [ClientRpc]
     private void OnBallPickUpClientRpc()
     {
-        PickUpBall();
-    }
-
-    private void PickUpBall()
-    {
         ballIndicator.SetActive(true);
-
-        foreach (var client in NetworkManager.ConnectedClients)
-        {
-            client.Value.PlayerObject.GetComponent<PlayerNetwork>().playerState.Value = PLAYER_STATE.InGame;
-        }
-
-        playerState.Value = PLAYER_STATE.LoosingHealth;
     }
 
     //*************
@@ -162,8 +157,6 @@ public class PlayerNetwork : NetworkBehaviour
     public void OnBallShootClientRpc(Vector2 dir)
     {
         ballIndicator.SetActive(false);
-
-
     }
 
     void Shoot(Vector2 dir)
@@ -215,5 +208,31 @@ public class PlayerNetwork : NetworkBehaviour
     public void OnLostGameClientRpc()
     {
         this.gameObject.SetActive(false);
+    }
+
+    public void KillPlayer()
+    {
+        hasBall.Value = false;
+        playerHealth.Value = 0;
+        playerState.Value = EPlayerState.Dead;
+    }
+
+    void HidePlayer()
+    {
+        graphics.SetActive(false);
+        GetComponent<Collider2D>().enabled = false;
+        GetComponent<Rigidbody2D>().simulated = false;
+    }
+
+    [ClientRpc]
+    public void KillPlayerClientRpc()
+    {
+        HidePlayer();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void KillPlayerServerRpc()
+    {
+        HidePlayer();
     }
 }
