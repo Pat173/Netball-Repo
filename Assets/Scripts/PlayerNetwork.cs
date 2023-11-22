@@ -6,6 +6,7 @@ using Unity.Multiplayer.Netball.ClientAuthority;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class PlayerNetwork : NetworkBehaviour
 {
@@ -48,12 +49,20 @@ public class PlayerNetwork : NetworkBehaviour
             uiManager = FindObjectOfType<UIManager>();
             playerName.Value = uiManager.UsernameInput;
         }
+        
+        InıtPlayerPosServerRpc();
+    }
+
+    [ServerRpc (RequireOwnership = false)]
+    void InıtPlayerPosServerRpc()
+    {
+        transform.position = new Vector2(Random.Range(-5, 5), -3f);
     }
 
     private void Update()
     {
         if (!IsOwner) return;
-
+        if(playerState.Value == EPlayerState.Dead) return;
         float moveSpeed = 3;
 
         if (Input.GetKey(KeyCode.W)) transform.Translate(Vector3.up * moveSpeed * Time.deltaTime);
