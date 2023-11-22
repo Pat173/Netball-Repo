@@ -261,6 +261,7 @@ public class PlayerNetwork : NetworkBehaviour
     public void RespawnPlayer()
     {
         hasBall.Value = false;
+        ballIndicator.SetActive(false);
         playerHealth.Value = 200;
         playerState.Value = EPlayerState.Alive;
     }
