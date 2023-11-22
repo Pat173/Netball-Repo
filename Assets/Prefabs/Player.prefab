@@ -537,6 +537,7 @@ MonoBehaviour:
     m_InternalValue: 0
   ballPrefab: {fileID: 8126233228704829682, guid: 3cb61459489597044b39ec331a1e8f8d, type: 3}
   damageRate: 10
+  movementSpeed: 6
   graphics: {fileID: 6131918336289102823}
   ballIndicator: {fileID: 3785145000669216706}
   shootPos: {fileID: 1148095391561590340}

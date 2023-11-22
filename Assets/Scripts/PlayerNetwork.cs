@@ -31,6 +31,7 @@ public class PlayerNetwork : NetworkBehaviour
 
     private GameObject spawnedBall;
 
+    public float movementSpeed = 20f;
     public GameObject graphics;
     public GameObject ballIndicator;
     public Transform shootPos;
@@ -67,7 +68,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (!IsOwner) return;
         if(playerState.Value == EPlayerState.Dead) return;
-        float moveSpeed = 3;
+        float moveSpeed = movementSpeed;
 
         if (Input.GetKey(KeyCode.W)) transform.Translate(Vector3.up * moveSpeed * Time.deltaTime);
         if (Input.GetKey(KeyCode.S)) transform.Translate(Vector3.down * moveSpeed * Time.deltaTime);

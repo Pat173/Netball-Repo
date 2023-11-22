@@ -69,10 +69,10 @@ public class LobbyManager : NetworkBehaviour
             else if (it == null && GameObject.FindWithTag("Ball") == null)
             {
                 Transform spawnedBall = Instantiate(ball);
-
+                
                 Ball ballScript = spawnedBall.GetComponent<Ball>();
                 ballScript.noFriction = true;
-
+                
                 spawnedBall.GetComponent<NetworkObject>().Spawn(true);
                 spawnedBall.GetComponent<Rigidbody2D>().AddForce(new Vector2(Random.Range(-5, 5), Random.Range(-5, 5)), ForceMode2D.Impulse);
             }
@@ -106,6 +106,16 @@ public class LobbyManager : NetworkBehaviour
     public void StartGame()
     {
         State = EGameState.GAME;
+        if (IsServer)
+        {
+            Transform spawnedBall = Instantiate(ball);
+
+            Ball ballScript = spawnedBall.GetComponent<Ball>();
+            ballScript.noFriction = true;
+
+            spawnedBall.GetComponent<NetworkObject>().Spawn(true);
+            spawnedBall.GetComponent<Rigidbody2D>().AddForce(new Vector2(Random.Range(-5, 5), Random.Range(-5, 5)), ForceMode2D.Impulse);
+        }
         Debug.Log("Game started");
     }
 
