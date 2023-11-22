@@ -20,7 +20,7 @@ public class PlayerNetwork : NetworkBehaviour
     public NetworkVariable<ulong> playerId = new NetworkVariable<ulong>(0);
     public NetworkVariable<FixedString32Bytes> playerName = new NetworkVariable<FixedString32Bytes>("Test", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     public NetworkVariable<EPlayerState> playerState = new NetworkVariable<EPlayerState>(EPlayerState.Alive);
-    public NetworkVariable<float> playerHealth = new NetworkVariable<float>(100);
+    public NetworkVariable<float> playerHealth = new NetworkVariable<float>(200);
     public NetworkVariable<bool> hasBall = new NetworkVariable<bool>(false);
 
     private Vector2 mousePos;

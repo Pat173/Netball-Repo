@@ -532,7 +532,7 @@ MonoBehaviour:
   playerState:
     m_InternalValue: 0
   playerHealth:
-    m_InternalValue: 100
+    m_InternalValue: 200
   hasBall:
     m_InternalValue: 0
   ballPrefab: {fileID: 8126233228704829682, guid: 3cb61459489597044b39ec331a1e8f8d, type: 3}
