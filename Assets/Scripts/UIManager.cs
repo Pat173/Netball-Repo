@@ -49,8 +49,6 @@ public class UIManager : MonoBehaviour
 
             hostIpText.text = GetLocalIPAddress();
             LayoutRebuilder.ForceRebuildLayoutImmediate(hostIpText.rectTransform);
-
-            NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>().playerName.Value = usernameInput;
         }
     }
 
@@ -127,9 +125,9 @@ public class UIManager : MonoBehaviour
 
             transport.ConnectionData.Address = ipInput;
             NetworkManager.Singleton.StartClient();
-            NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>().playerName.Value = usernameInput;
         }
     }
+
 
     public void ShowUI(bool show)
     {

@@ -16,4 +16,16 @@ public class PlayerList : Singleton<PlayerList>
         Players.Remove(id);
         Debug.Log($"Player removed: {id}");
     }
+
+    public PlayerNetwork GetLocalPlayer()
+    {
+        foreach (var player in Players)
+        {
+            if (player.Value.IsLocalPlayer)
+            {
+                return player.Value;
+            }
+        }
+        return null;
+    }
 }

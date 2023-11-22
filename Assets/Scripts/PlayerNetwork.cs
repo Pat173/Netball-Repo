@@ -33,6 +33,7 @@ public class PlayerNetwork : NetworkBehaviour
     public GameObject graphics;
     public GameObject ballIndicator;
     public Transform shootPos;
+    public UIManager uiManager;
 
     public override void OnNetworkSpawn()
     {
@@ -41,6 +42,12 @@ public class PlayerNetwork : NetworkBehaviour
 
         playerId.Value = OwnerClientId;
         PlayerList.Instance.PlayerAdd(playerId.Value, this);
+
+        if (IsOwner)
+        {
+            uiManager = FindObjectOfType<UIManager>();
+            playerName.Value = uiManager.UsernameInput;
+        }
     }
 
     private void Update()
