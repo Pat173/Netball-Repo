@@ -217,22 +217,43 @@ public class PlayerNetwork : NetworkBehaviour
         playerState.Value = EPlayerState.Dead;
     }
 
-    void HidePlayer()
+    void HidePlayer(bool hide = true)
     {
-        graphics.SetActive(false);
-        GetComponent<Collider2D>().enabled = false;
-        GetComponent<Rigidbody2D>().simulated = false;
+        graphics.SetActive(!hide);
+        GetComponent<Collider2D>().enabled = !hide;
+        GetComponent<Rigidbody2D>().simulated = !hide;
     }
 
     [ClientRpc]
     public void KillPlayerClientRpc()
     {
         HidePlayer();
+        ballIndicator.SetActive(false);
     }
 
     [ServerRpc(RequireOwnership = false)]
     public void KillPlayerServerRpc()
     {
         HidePlayer();
+        ballIndicator.SetActive(false);
+    }
+
+    public void RespawnPlayer()
+    {
+        hasBall.Value = false;
+        playerHealth.Value = 100;
+        playerState.Value = EPlayerState.Alive;
+    }
+
+    [ClientRpc]
+    public void RespawnPlayerClientRpc()
+    {
+        HidePlayer(false);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void RespawnPlayerServerRpc()
+    {
+        HidePlayer(false);
     }
 }

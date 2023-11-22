@@ -12,10 +12,16 @@ public enum EGameState
 
 public class LobbyManager : NetworkBehaviour
 {
+    UIManager uiManager;
     public Transform ball;
 
     NetworkVariable<EGameState> gameState = new NetworkVariable<EGameState>(EGameState.LOBBY, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public EGameState State { get => gameState.Value; set => gameState.Value = value; }
+
+    void Start()
+    {
+        uiManager = FindObjectOfType<UIManager>();
+    }
 
     public override void OnNetworkSpawn()
     {
@@ -24,22 +30,10 @@ public class LobbyManager : NetworkBehaviour
 
     public void Update()
     {
-        if (!NetworkManager.Singleton.IsServer) return;
-
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (State == EGameState.GAME && NetworkManager.Singleton.IsServer)
         {
-            if (State == EGameState.LOBBY)
-                StartGame();
-            else if (State == EGameState.GAME)
-                EndGame();
-        }
+            uiManager.ShowUI(false);
 
-        if (State == EGameState.LOBBY)
-        {
-
-        }
-        else if (State == EGameState.GAME)
-        {
             // Check if any player has the ball
             PlayerNetwork it = null;
             List<PlayerNetwork> alivePlayers = new List<PlayerNetwork>();
@@ -82,6 +76,30 @@ public class LobbyManager : NetworkBehaviour
                 spawnedBall.GetComponent<NetworkObject>().Spawn(true);
                 spawnedBall.GetComponent<Rigidbody2D>().AddForce(new Vector2(Random.Range(-5, 5), Random.Range(-5, 5)), ForceMode2D.Impulse);
             }
+        }
+        else if (State == EGameState.END && NetworkManager.Singleton.IsServer)
+        {
+            foreach (var player in PlayerList.Instance.Players)
+            {
+                player.Value.RespawnPlayer();
+                player.Value.RespawnPlayerServerRpc();
+                player.Value.RespawnPlayerClientRpc();
+            }
+        }
+
+        if (State == EGameState.LOBBY)
+        {
+            uiManager.ShowUI(true);
+        }
+
+        if (State == EGameState.GAME)
+        {
+            uiManager.ShowUI(false);
+        }
+
+        if (State == EGameState.END)
+        {
+            uiManager.ShowUI(true);
         }
     }
 
