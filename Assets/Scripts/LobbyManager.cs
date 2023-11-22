@@ -95,6 +95,13 @@ public class LobbyManager : NetworkBehaviour
                 player.Value.RespawnPlayerServerRpc();
                 player.Value.RespawnPlayerClientRpc();
             }
+
+            var existingBall = GameObject.FindWithTag("Ball");
+            if (existingBall != null)
+            {
+                Destroy(existingBall);
+                doKillBall = false;
+            }
         }
 
         if (State == EGameState.LOBBY)
