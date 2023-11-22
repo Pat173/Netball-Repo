@@ -51,14 +51,16 @@ public class PlayerNetwork : NetworkBehaviour
         if (IsOwner)
         {
             uiManager = FindObjectOfType<UIManager>();
-            playerName.Value = uiManager.UsernameInput;
+
+            int random = Random.Range(0, 1000);
+            playerName.Value = uiManager.UsernameInput == null ? "Player" + random : uiManager.UsernameInput;
         }
-        
+
         InıtPlayerPosServerRpc();
         graphicColor.color = colors[(int)OwnerClientId];
     }
 
-    [ServerRpc (RequireOwnership = false)]
+    [ServerRpc(RequireOwnership = false)]
     void InıtPlayerPosServerRpc()
     {
         transform.position = new Vector2(Random.Range(-5, 5), -3f);
@@ -67,7 +69,7 @@ public class PlayerNetwork : NetworkBehaviour
     private void Update()
     {
         if (!IsOwner) return;
-        if(playerState.Value == EPlayerState.Dead) return;
+        if (playerState.Value == EPlayerState.Dead) return;
         float moveSpeed = movementSpeed;
 
         if (Input.GetKey(KeyCode.W)) transform.Translate(Vector3.up * moveSpeed * Time.deltaTime);

@@ -18,6 +18,8 @@ public class LobbyManager : NetworkBehaviour
     NetworkVariable<EGameState> gameState = new NetworkVariable<EGameState>(EGameState.LOBBY, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public EGameState State { get => gameState.Value; set => gameState.Value = value; }
 
+    bool doKillBall = false;
+
     void Start()
     {
         uiManager = FindObjectOfType<UIManager>();
@@ -61,15 +63,21 @@ public class LobbyManager : NetworkBehaviour
                     player.Value.KillPlayer();
                     player.Value.KillPlayerServerRpc();
                     player.Value.KillPlayerClientRpc();
+                    doKillBall = true;
                 }
             }
+
+            var existingBall = GameObject.FindWithTag("Ball");
 
             if (alivePlayers.Count <= 1)
             {
                 EndGame();
             }
-            else if (it == null && GameObject.FindWithTag("Ball") == null)
+            else if (existingBall != null && it == null && doKillBall)
             {
+                Destroy(existingBall);
+                doKillBall = false;
+
                 Transform spawnedBall = Instantiate(ball);
 
                 Ball ballScript = spawnedBall.GetComponent<Ball>();
