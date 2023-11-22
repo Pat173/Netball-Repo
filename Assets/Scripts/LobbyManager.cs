@@ -54,7 +54,9 @@ public class LobbyManager : NetworkBehaviour
                     player.Value.playerHealth.Value -= player.Value.damageRate * Time.deltaTime;
                 }
 
-                if (player.Value.playerHealth.Value <= 0)
+                if (player.Value.playerHealth.Value <= 0
+                    && player.Value.playerState.Value == PlayerNetwork.EPlayerState.Alive
+                    || player.Value.playerHealth.Value <= 0 && player.Value.playerState.Value == PlayerNetwork.EPlayerState.It)
                 {
                     player.Value.KillPlayer();
                     player.Value.KillPlayerServerRpc();
@@ -69,10 +71,10 @@ public class LobbyManager : NetworkBehaviour
             else if (it == null && GameObject.FindWithTag("Ball") == null)
             {
                 Transform spawnedBall = Instantiate(ball);
-                
+
                 Ball ballScript = spawnedBall.GetComponent<Ball>();
                 ballScript.noFriction = true;
-                
+
                 spawnedBall.GetComponent<NetworkObject>().Spawn(true);
                 spawnedBall.GetComponent<Rigidbody2D>().AddForce(new Vector2(Random.Range(-5, 5), Random.Range(-5, 5)), ForceMode2D.Impulse);
             }

@@ -1,15 +1,11 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Windows;
 using System.Net;
-using System.Net.Sockets;
 
 public class UIManager : MonoBehaviour
 {
@@ -37,7 +33,7 @@ public class UIManager : MonoBehaviour
         set => usernameInput = value;
     }
 
-    public void StartHost()
+    public void StartHost(bool outbound = false)
     {
         if (NetworkManager.Singleton.IsHost)
         {
@@ -45,6 +41,13 @@ public class UIManager : MonoBehaviour
         }
         else
         {
+            UnityTransport transport = NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>();
+
+            if (outbound)
+                transport.ConnectionData.Address = GetLocalIPAddress();
+            else
+                transport.ConnectionData.Address = "127.0.0.1";
+
             NetworkManager.Singleton.StartHost();
 
             hostIpText.text = GetLocalIPAddress();
@@ -96,16 +99,10 @@ public class UIManager : MonoBehaviour
 
     public static string GetLocalIPAddress()
     {
-        var host = Dns.GetHostEntry(Dns.GetHostName());
-        foreach (var ip in host.AddressList)
-        {
-            if (ip.AddressFamily == AddressFamily.InterNetwork)
-            {
-                return ip.ToString();
-            }
-        }
+        string externalIpString = new WebClient().DownloadString("http://ipv4.icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
+        var externalIp = IPAddress.Parse(externalIpString);
 
-        return "unknown";
+        return externalIp.ToString();
     }
 
     public void ClientConnect()
