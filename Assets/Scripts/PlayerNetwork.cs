@@ -36,6 +36,9 @@ public class PlayerNetwork : NetworkBehaviour
     public Transform shootPos;
     public UIManager uiManager;
 
+    public SpriteRenderer graphicColor;
+    public List<Color> colors = new List<Color>();
+
     public override void OnNetworkSpawn()
     {
         cam = Camera.main;
@@ -51,6 +54,7 @@ public class PlayerNetwork : NetworkBehaviour
         }
         
         InıtPlayerPosServerRpc();
+        graphicColor.color = colors[(int)OwnerClientId];
     }
 
     [ServerRpc (RequireOwnership = false)]
@@ -257,7 +261,7 @@ public class PlayerNetwork : NetworkBehaviour
     public void RespawnPlayer()
     {
         hasBall.Value = false;
-        playerHealth.Value = 100;
+        playerHealth.Value = 200;
         playerState.Value = EPlayerState.Alive;
     }
 
