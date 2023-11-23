@@ -4947,6 +4947,10 @@ MonoBehaviour:
   playerListLobbyParent: {fileID: 170869306}
   playerLobbyUIPrefab: {fileID: 9166572390993728251, guid: 3c80b00401f19d44bbe875aaf898cbbe, type: 3}
   hostIpText: {fileID: 972988551}
+  disconnectedColor: {r: 1, g: 0, b: 0, a: 1}
+  connectedColor: {r: 0, g: 1, b: 0.052682877, a: 1}
+  connectionIndicator: {fileID: 969565361}
+  connectionText: {fileID: 1302730932}
 --- !u!1 &1876568002
 GameObject:
   m_ObjectHideFlags: 0

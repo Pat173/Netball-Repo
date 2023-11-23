@@ -60,6 +60,11 @@ public class PlayerNetwork : NetworkBehaviour
         graphicColor.color = colors[(int)OwnerClientId];
     }
 
+    public override void OnNetworkDespawn()
+    {
+        PlayerList.Instance.PlayerRemove(playerId.Value);
+    }
+
     [ServerRpc(RequireOwnership = false)]
     void InıtPlayerPosServerRpc()
     {

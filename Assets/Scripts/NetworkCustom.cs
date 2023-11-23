@@ -23,7 +23,7 @@ public class NetworkCustom : NetworkManager
     public void hkServerStarted()
     {
         // if not server, don't spawn the game manager
-        if (!IsServer) return;
+        // if (!IsServer) return;
 
         gameManagerInstance = Instantiate(gameManagerPrefab);
         NetworkObject networkObject = gameManagerInstance.GetComponent<NetworkObject>();

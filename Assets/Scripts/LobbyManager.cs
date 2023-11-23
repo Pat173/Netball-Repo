@@ -32,6 +32,19 @@ public class LobbyManager : NetworkBehaviour
 
     public void Update()
     {
+        if (NetworkManager.Singleton.IsServer)
+        {
+            // Spawn ball button
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                var existingBall = GameObject.FindWithTag("Ball");
+                if (existingBall != null)
+                    Destroy(existingBall);
+
+                SpawnNewBall();
+            }
+        }
+
         if (State == EGameState.GAME && NetworkManager.Singleton.IsServer)
         {
             uiManager.ShowUI(false);
@@ -77,14 +90,11 @@ public class LobbyManager : NetworkBehaviour
             {
                 Destroy(existingBall);
                 doKillBall = false;
+            }
 
-                Transform spawnedBall = Instantiate(ball);
-
-                Ball ballScript = spawnedBall.GetComponent<Ball>();
-                ballScript.noFriction = true;
-
-                spawnedBall.GetComponent<NetworkObject>().Spawn(true);
-                spawnedBall.GetComponent<Rigidbody2D>().AddForce(new Vector2(Random.Range(-5, 5), Random.Range(-5, 5)), ForceMode2D.Impulse);
+            if (existingBall == null && it == null)
+            {
+                SpawnNewBall();
             }
         }
         else if (State == EGameState.END && NetworkManager.Singleton.IsServer)
@@ -118,6 +128,17 @@ public class LobbyManager : NetworkBehaviour
         {
             uiManager.ShowUI(true);
         }
+    }
+
+    public void SpawnNewBall()
+    {
+        Transform spawnedBall = Instantiate(ball);
+
+        Ball ballScript = spawnedBall.GetComponent<Ball>();
+        ballScript.noFriction = true;
+
+        spawnedBall.GetComponent<NetworkObject>().Spawn(true);
+        spawnedBall.GetComponent<Rigidbody2D>().AddForce(new Vector2(Random.Range(-5, 5), Random.Range(-5, 5)), ForceMode2D.Impulse);
     }
 
     public void StartGame()

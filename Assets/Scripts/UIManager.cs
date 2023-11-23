@@ -18,8 +18,12 @@ public class UIManager : MonoBehaviour
     public GameObject playerLobbyUIPrefab;
     public TMP_Text hostIpText;
 
-    PlayerList playerList;
-    List<PlayerNetwork> players = new List<PlayerNetwork>();
+    public Color disconnectedColor;
+    public Color connectedColor;
+    public Image connectionIndicator;
+    public TMP_Text connectionText;
+
+    List<UIPlayerName> playerLobbyUIs = new List<UIPlayerName>();
 
     public string IpInput
     {
@@ -57,27 +61,45 @@ public class UIManager : MonoBehaviour
 
     public void Update()
     {
-        // add 1 prefab for each player in the player list
-        if (playerList == null)
-            playerList = FindObjectOfType<PlayerList>();
+        // add 1 prefab for each player in the player list   
+        foreach (var player in PlayerList.Instance.Players)
+        {
+            // make sure each player is only added once
+            if (!playerLobbyUIs.Exists(x => x.playerId == player.Value.playerId.Value))
+            {
+                GameObject playerLobbyUIInstance = Instantiate(playerLobbyUIPrefab);
+                playerLobbyUIInstance.transform.SetParent(playerListLobbyParent);
+
+                // get tmp text component
+                UIPlayerName uiPlayerName = playerLobbyUIInstance.GetComponent<UIPlayerName>();
+                uiPlayerName.playerId = player.Value.playerId.Value;
+
+                playerLobbyUIInstance.transform.localScale = Vector3.one;
+
+                playerLobbyUIs.Add(uiPlayerName);
+            }
+        }
+
+        // make sure if a player leaves, the ui element is removed
+        foreach (var playerLobbyUI in playerLobbyUIs)
+        {
+            if (!PlayerList.Instance.Players.ContainsKey(playerLobbyUI.playerId))
+            {
+                playerLobbyUIs.Remove(playerLobbyUI);
+                Destroy(playerLobbyUI.gameObject);
+            }
+        }
+
+        // if connected, change color of connection indicator
+        if (NetworkManager.Singleton.IsConnectedClient || NetworkManager.Singleton.IsHost)
+        {
+            connectionIndicator.color = connectedColor;
+            connectionText.text = "Status: Connected";
+        }
         else
         {
-            foreach (var player in playerList.Players)
-            {
-                if (!players.Contains(player.Value))
-                {
-                    players.Add(player.Value);
-
-                    GameObject playerLobbyUIInstance = Instantiate(playerLobbyUIPrefab);
-                    playerLobbyUIInstance.transform.SetParent(playerListLobbyParent);
-
-                    // get tmp text component
-                    TMP_Text tmpText = playerLobbyUIInstance.GetComponent<TMP_Text>();
-                    tmpText.text = player.Value.playerName.Value.ToString();
-
-                    playerLobbyUIInstance.transform.localScale = Vector3.one;
-                }
-            }
+            connectionIndicator.color = disconnectedColor;
+            connectionText.text = "Status: Disconnected";
         }
     }
 
@@ -124,7 +146,6 @@ public class UIManager : MonoBehaviour
             NetworkManager.Singleton.StartClient();
         }
     }
-
 
     public void ShowUI(bool show)
     {
