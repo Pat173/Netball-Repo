@@ -32,6 +32,8 @@ public class LobbyManager : NetworkBehaviour
 
     public void Update()
     {
+        PlayerList.Instance.OnUpdate();
+
         if (NetworkManager.Singleton.IsServer)
         {
             // Spawn ball button

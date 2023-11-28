@@ -28,4 +28,16 @@ public class PlayerList : Singleton<PlayerList>
         }
         return null;
     }
+
+    public void OnUpdate()
+    {
+        foreach (var player in Players)
+        {
+            if (player.Value == null)
+            {
+                Players.Remove(player.Key);
+                break;
+            }
+        }
+    }
 }
