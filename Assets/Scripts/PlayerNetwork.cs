@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Collections;
 using Unity.Multiplayer.Netball.ClientAuthority;
 using Unity.Netcode;
@@ -33,6 +34,8 @@ public class PlayerNetwork : NetworkBehaviour
 
     public float movementSpeed = 20f;
     public GameObject graphics;
+    public GameObject canvas;
+    public TextMeshProUGUI nameText;
     public GameObject ballIndicator;
     public Transform shootPos;
     public UIManager uiManager;
@@ -54,15 +57,33 @@ public class PlayerNetwork : NetworkBehaviour
 
             int random = Random.Range(0, 1000);
             playerName.Value = uiManager.UsernameInput == null ? "Player" + random : uiManager.UsernameInput;
+           // PlayerNameServerRpc(playerName.Value);
+           // PlayerNameClientRpc(playerName.Value);
+           // nameText.text = playerName.Value.ToString();
         }
 
         InıtPlayerPosServerRpc();
         graphicColor.color = colors[(int)OwnerClientId];
+        
     }
+
+    /*[ServerRpc(RequireOwnership = false)]
+    void PlayerNameServerRpc(FixedString32Bytes myplayer)
+    {
+        nameText.text = myplayer.ToString();
+    }
+
+    [ClientRpc]
+    void PlayerNameClientRpc(FixedString32Bytes myplayer)
+    {
+        nameText.text = myplayer.ToString();
+    }
+    */
 
     [ServerRpc(RequireOwnership = false)]
     void InıtPlayerPosServerRpc()
     {
+        
         transform.position = new Vector2(Random.Range(-5, 5), -3f);
     }
 
@@ -243,6 +264,7 @@ public class PlayerNetwork : NetworkBehaviour
     void HidePlayer(bool hide = true)
     {
         graphics.SetActive(!hide);
+        canvas.SetActive(!hide);
         GetComponent<Collider2D>().enabled = !hide;
         GetComponent<Rigidbody2D>().simulated = !hide;
     }
@@ -263,6 +285,7 @@ public class PlayerNetwork : NetworkBehaviour
 
     public void RespawnPlayer()
     {
+        transform.position = new Vector2(Random.Range(-5, 5), 0f);
         hasBall.Value = false;
         ballIndicator.SetActive(false);
         playerHealth.Value = 200;
