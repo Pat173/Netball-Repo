@@ -6,6 +6,8 @@ using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Net;
+using System.Net.Sockets;
+using System.Net.NetworkInformation;
 
 public class UIManager : MonoBehaviour
 {
@@ -48,13 +50,17 @@ public class UIManager : MonoBehaviour
             UnityTransport transport = NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>();
 
             if (outbound)
-                transport.ConnectionData.Address = GetLocalIPAddress();
+            {
+                transport.ConnectionData.Address = GetOutboundAddress();
+                hostIpText.text = GetOutboundAddress();
+            }
             else
+            {
                 transport.ConnectionData.Address = "127.0.0.1";
+                hostIpText.text = GetLocalAddress();
+            }
 
             NetworkManager.Singleton.StartHost();
-
-            hostIpText.text = GetLocalIPAddress();
             LayoutRebuilder.ForceRebuildLayoutImmediate(hostIpText.rectTransform);
         }
     }
@@ -116,15 +122,34 @@ public class UIManager : MonoBehaviour
 
     public void CopyIp()
     {
-        GUIUtility.systemCopyBuffer = GetLocalIPAddress();
+        GUIUtility.systemCopyBuffer = GetOutboundAddress();
     }
 
-    public static string GetLocalIPAddress()
+    public static string GetOutboundAddress()
     {
         string externalIpString = new WebClient().DownloadString("http://ipv4.icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
         var externalIp = IPAddress.Parse(externalIpString);
 
         return externalIp.ToString();
+    }
+
+    public static string GetLocalAddress()
+    {
+        foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+        {
+            if (ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 || ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+            {
+                foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                {
+                    if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        return ip.Address.ToString();
+                    }
+                }
+            }
+        }
+
+        return "127.0.0.1";
     }
 
     public void ClientConnect()
