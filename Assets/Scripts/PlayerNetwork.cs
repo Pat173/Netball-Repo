@@ -57,28 +57,13 @@ public class PlayerNetwork : NetworkBehaviour
 
             int random = Random.Range(0, 1000);
             playerName.Value = uiManager.UsernameInput == null ? "Player" + random : uiManager.UsernameInput;
-           // PlayerNameServerRpc(playerName.Value);
-           // PlayerNameClientRpc(playerName.Value);
-           // nameText.text = playerName.Value.ToString();
         }
 
         InıtPlayerPosServerRpc();
         graphicColor.color = colors[(int)OwnerClientId];
         
     }
-
-    /*[ServerRpc(RequireOwnership = false)]
-    void PlayerNameServerRpc(FixedString32Bytes myplayer)
-    {
-        nameText.text = myplayer.ToString();
-    }
-
-    [ClientRpc]
-    void PlayerNameClientRpc(FixedString32Bytes myplayer)
-    {
-        nameText.text = myplayer.ToString();
-    }
-    */
+    
 
     [ServerRpc(RequireOwnership = false)]
     void InıtPlayerPosServerRpc()

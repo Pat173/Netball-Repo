@@ -84,6 +84,7 @@ public class UIManager : MonoBehaviour
 
                 playerLobbyUIs.Add(uiPlayerName);
             }
+            player.Value.nameText.text = player.Value.playerName.Value.ToString();
         }
 
         // make sure if a player leaves, the ui element is removed
